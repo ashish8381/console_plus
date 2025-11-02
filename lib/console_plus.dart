@@ -162,14 +162,7 @@ class _LogConsoleWidgetState extends State<_LogConsoleWidget> {
 
 
   Widget _buildConsoleContent(ScrollController scrollController, Function setSheetState) {
-
-    // List<LogEntry> visibleLogs = List.unmodifiable(
-    //   filterType == null
-    //       ? DebugLogConsole.logs
-    //       : DebugLogConsole.logs.where((l) => l.type == filterType),
-    // );
-
-
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
         scrollController.jumpTo(scrollController.position.maxScrollExtent);

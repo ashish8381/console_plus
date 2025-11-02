@@ -27,4 +27,3 @@ abstract class ConsolePlusPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }
-

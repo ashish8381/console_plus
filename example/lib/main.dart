@@ -34,10 +34,11 @@ class MyApp extends StatelessWidget {
         floatingActionButton: Builder(
           builder: (innerContext) {
             return FloatingActionButton(
-              onPressed: () => DebugLogConsole.show(innerContext), // ✅ Opens Console
+              onPressed: () => DebugLogConsole.show(innerContext),
+              // ✅ Opens Console
               child: const Icon(Icons.bug_report),
             );
-          }
+          },
         ),
       ),
     );

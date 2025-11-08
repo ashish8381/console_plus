@@ -126,9 +126,9 @@ PRs welcome. Keep debug-only behaviour intact. If you add native platform code, 
 
 ---
 
-| Floating Button                                                                                                          | Console Overlay                                                                                                   | Search Filter                                                                                                    |
-|--------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| <img src="https://raw.githubusercontent.com/ashish8381/console_plus/example/screenshots/floatingButton.png" width="250"> | <img src="https://raw.githubusercontent.com/ashish8381/console_plus/example/screenshots/console.png" width="250"> | <img src="https://raw.githubusercontent.com/ashish8381/console_plus/example/screenshots/filter.png" width="250"> |
+| Floating Button                                                                                                               | Console Overlay                                                                                                        | Search Filter                                                                                                         |
+|-------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| <img src="https://raw.githubusercontent.com/ashish8381/console_plus/main/example/screenshots/floatingButton.png" width="250"> | <img src="https://raw.githubusercontent.com/ashish8381/console_plus/main/example/screenshots/console.png" width="250"> | <img src="https://raw.githubusercontent.com/ashish8381/console_plus/main/example/screenshots/filter.png" width="250"> |
 
 
 ---

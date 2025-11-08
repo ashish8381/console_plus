@@ -1,9 +1,17 @@
 name: console_plus
-description: A Flutter plugin for in-app debug console with floating button, log filtering, export, auto-scroll etc.
-version: 0.0.2
+description: A Flutter plugin that provides an elegant in-app developer console with
+  floating button, real-time log capture, log filtering, auto-scroll, export,
+  and dark translucent UI inspired by modern dev tools.
+version: 1.0.0
 documentation: https://github.com/ashish8381/console_plus#readme
-homepage: https://github.com/ashish8381/console_plus # Optional
+homepage: https://github.com/ashish8381/console_plus
 repository: https://github.com/ashish8381/console_plus
+
+screenshots:
+  - description: "Console+ Plugin Logo"
+    path: logo.png
+  - description: "Floating Console UI with Log Filters"
+    path: example/screenshots/console.png
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -17,6 +25,9 @@ dependencies:
   js_interop: ^0.0.1
   plugin_platform_interface: ^2.1.5
   web: ^1.1.1
+  path_provider: ^2.1.3
+  file_saver: ^0.2.13
+  dropdown_button2: ^2.3.9
 
 dev_dependencies:
   flutter_test:

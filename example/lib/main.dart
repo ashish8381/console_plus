@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:console_plus_example/test2.dart';
 import 'package:flutter/material.dart';
 import 'package:console_plus/console_plus.dart';
 
@@ -17,8 +18,8 @@ void main() {
 void startTimer() {
   _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
     final now = DateTime.now();
-    print("⏱ Timer Log: $now"); // ✅ Logs in Android Studio
     DebugLogConsole.log("⏱ Timer Log: $now"); // ✅ Safe: now UI exists
+    DebugLogConsole.log("1276 $now"); // ✅ Safe: now UI exists
   });
 }
 
@@ -26,15 +27,29 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext tcontext) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text("ConsolePlus Timer Logs")),
-        body: const Center(child: Text("Tap the 🐞 button to view logs")),
+        body: Builder(
+          builder: (innerContext) => InkWell(
+            onTap: () {
+              Navigator.push(
+                innerContext, // ✅ Use context INSIDE MaterialApp
+                MaterialPageRoute(builder: (context) => const Test2()),
+              );
+            },
+            child: const Center(child: Text("Tap the 🐞 button to view logs")),
+          ),
+        ),
         floatingActionButton: Builder(
           builder: (innerContext) {
             return FloatingActionButton(
-              onPressed: () => DebugLogConsole.show(innerContext),
+              onPressed: () {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  FloatingDebugButton.show(innerContext);
+                });
+              },
               // ✅ Opens Console
               child: const Icon(Icons.bug_report),
             );

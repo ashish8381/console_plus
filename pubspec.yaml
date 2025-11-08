@@ -1,7 +1,7 @@
 name: console_plus
 description: A Flutter plugin that provides an elegant in-app developer console with
   floating button.
-version: 1.0.0
+version: 1.0.2
 documentation: https://github.com/ashish8381/console_plus#readme
 homepage: https://github.com/ashish8381/console_plus
 repository: https://github.com/ashish8381/console_plus

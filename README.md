@@ -1,6 +1,13 @@
 
 # ConsolePlus
 
+[![Pub Version](https://img.shields.io/pub/v/console_plus?color=blue)](https://pub.dev/packages/console_plus)
+[![Likes](https://img.shields.io/pub/likes/console_plus)](https://pub.dev/packages/console_plus)
+[![Pub Points](https://img.shields.io/pub/points/console_plus)](https://pub.dev/packages/console_plus)
+[![Flutter Favorite](https://img.shields.io/badge/Flutter-Favorite-cyan)](#)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Flutter%20|%20Android%20|%20iOS%20|%20Web-blue)](#)
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/ashish8381/console_plus/main/logo.png" width="120" alt="Console+ Logo">
 </p>

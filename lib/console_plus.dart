@@ -190,6 +190,7 @@ class _FloatingConsoleWidgetState extends State<_FloatingConsoleWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (!kDebugMode) return const SizedBox.shrink();
     return Positioned(
       left: position.dx,
       top: position.dy,

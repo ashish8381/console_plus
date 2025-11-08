@@ -68,7 +68,7 @@ All notable changes to this project will be documented here.
 ## 🧑‍💻 Developer Note:
   This update improves your plugin’s pub.dev score by ensuring dependency freshness and Flutter compatibility.
 
-## 1.0.2
+## 1.0.3
 
 ## 📦 Release Mode Improvements
 

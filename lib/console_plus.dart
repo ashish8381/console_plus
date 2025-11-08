@@ -84,7 +84,6 @@ class FloatingConsole {
   static bool _isVisible = false;
 
   static void show(BuildContext context) {
-
     if (!kDebugMode) return;
 
     if (_isVisible) return;

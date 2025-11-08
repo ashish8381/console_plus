@@ -53,3 +53,17 @@ All notable changes to this project will be documented here.
 - Added horizontal + vertical scroll sync for long logs.
 - Enhanced file export naming: uses timestamp-based file names (`debug_logs_YYYY-MM-DD_HH-mm-ss.json`).
 - Documentation and logo added for GitHub and pub.dev release.
+
+## 1.0.1
+
+## 📦 Maintenance & Improvements
+- ✅ Updated all dependencies to the latest stable versions:
+  - file_saver → ^0.3.1
+  - path_provider → ^2.1.5
+  - plugin_platform_interface → ^2.1.8
+- ⚙️ Improved compatibility with Flutter 3.24+ SDK
+- 🧹 Minor internal cleanup and formatting (dart format .)
+- 🧠 Ready for Dart 3.x and Flutter 3.10+ environments
+
+## 🧑‍💻 Developer Note:
+  This update improves your plugin’s pub.dev score by ensuring dependency freshness and Flutter compatibility.

@@ -316,7 +316,7 @@ class _FloatingConsoleWidgetState extends State<_FloatingConsoleWidget> {
                         name: fileName,
                         bytes: bytes,
                         mimeType: MimeType.json,
-                        ext: 'json',
+                        fileExtension: 'json',
                       );
 
                       if (context.mounted) {

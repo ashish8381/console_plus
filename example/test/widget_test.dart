@@ -1,27 +1,20 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:console_plus_example/main.dart';
+import 'package:console_plus/console_plus.dart';
 
 void main() {
-  testWidgets('Verify Platform version', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that platform version is retrieved.
-    expect(
-      find.byWidgetPredicate(
-        (Widget widget) =>
-            widget is Text && widget.data!.startsWith('Running on:'),
-      ),
-      findsOneWidget,
-    );
+  test('should add and clear logs', () {
+    DebugLogConsole.addLog("Hello", type: LogType.info);
+    expect(DebugLogConsole.logs.length, 1);
+
+    DebugLogConsole.clear();
+    expect(DebugLogConsole.logs.isEmpty, true);
+  });
+
+  test('should export logs as JSON', () async {
+    DebugLogConsole.addLog("Test", type: LogType.error);
+    final json = await DebugLogConsole.exportLogs(asJson: true);
+    expect(json.contains("Test"), true);
   });
 }

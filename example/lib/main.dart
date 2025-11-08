@@ -1,57 +1,63 @@
-import 'dart:async';
-import 'package:console_plus_example/test2.dart';
 import 'package:flutter/material.dart';
 import 'package:console_plus/console_plus.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-
-  // ✅ Start logging only after UI is built
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    startTimer();
-  });
+  runApp(const ConsolePlusExampleApp());
 }
 
-void startTimer() {
-  Timer.periodic(const Duration(seconds: 2), (timer) {
-    final now = DateTime.now();
-    DebugLogConsole.log("⏱ Timer Log: $now"); // ✅ Safe: now UI exists
-    DebugLogConsole.log("1276 $now"); // ✅ Safe: now UI exists
-  });
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ConsolePlusExampleApp extends StatelessWidget {
+  const ConsolePlusExampleApp({super.key});
 
   @override
-  Widget build(BuildContext tcontext) {
+  Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text("ConsolePlus Timer Logs")),
-        body: Builder(
-          builder: (innerContext) => InkWell(
-            onTap: () {
-              Navigator.push(
-                innerContext, // ✅ Use context INSIDE MaterialApp
-                MaterialPageRoute(builder: (context) => const Test2()),
-              );
-            },
-            child: const Center(child: Text("Tap the 🐞 button to view logs")),
-          ),
-        ),
-        floatingActionButton: Builder(
-          builder: (innerContext) {
-            return FloatingActionButton(
+      title: 'ConsolePlus Example',
+      theme: ThemeData.dark(useMaterial3: true),
+      home: const ExampleHome(),
+    );
+  }
+}
+
+class ExampleHome extends StatefulWidget {
+  const ExampleHome({super.key});
+
+  @override
+  State<ExampleHome> createState() => _ExampleHomeState();
+}
+
+class _ExampleHomeState extends State<ExampleHome> {
+  int counter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Show floating debug button when the app starts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FloatingDebugButton.show(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("ConsolePlus Example")),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Button pressed $counter times"),
+            const SizedBox(height: 20),
+            ElevatedButton(
               onPressed: () {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  FloatingDebugButton.show(innerContext);
-                });
+                counter++;
+                DebugLogConsole.log("Info log #$counter", type: LogType.info);
+                DebugLogConsole.log("Warning log #$counter", type: LogType.warning);
+                DebugLogConsole.log("Error log #$counter", type: LogType.error);
+                setState(() {});
               },
-              // ✅ Opens Console
-              child: const Icon(Icons.bug_report),
-            );
-          },
+              child: const Text("Generate Logs"),
+            ),
+          ],
         ),
       ),
     );

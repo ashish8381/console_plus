@@ -135,10 +135,11 @@ PRs welcome. Keep debug-only behaviour intact. If you add native platform code, 
 
 ## 📜 License
 
-MIT License © 2025 Ashish
-See LICENSE for details.
+[MIT License](https://opensource.org/licenses/MIT) © 2025 [Ashish](https://github.com/ashish8381)  
+See the full [LICENSE](https://github.com/ashish8381/console_plus/blob/main/LICENSE) file for details.
 
 ---
+
 
 ## 💬 Credits
 

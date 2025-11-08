@@ -3,8 +3,6 @@ import 'package:console_plus_example/test2.dart';
 import 'package:flutter/material.dart';
 import 'package:console_plus/console_plus.dart';
 
-Timer? _timer;
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -16,7 +14,7 @@ void main() {
 }
 
 void startTimer() {
-  _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+  Timer.periodic(const Duration(seconds: 2), (timer) {
     final now = DateTime.now();
     DebugLogConsole.log("⏱ Timer Log: $now"); // ✅ Safe: now UI exists
     DebugLogConsole.log("1276 $now"); // ✅ Safe: now UI exists

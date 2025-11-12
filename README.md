@@ -1,5 +1,5 @@
 
-# ConsolePlus
+## ConsolePlus
 
 [![Pub Version](https://img.shields.io/pub/v/console_plus?color=blue)](https://pub.dev/packages/console_plus)
 [![Likes](https://img.shields.io/pub/likes/console_plus)](https://pub.dev/packages/console_plus)
@@ -12,37 +12,44 @@
   <img src="https://raw.githubusercontent.com/ashish8381/console_plus/main/logo.png" width="120" alt="Console+ Logo">
 </p>
 
-A floating in-app console for Flutter — view, filter, search & export logs while your app runs!
-`console_plus` provides a non-intrusive floating console for Flutter apps, designed to debug logs directly on-device.
-
-It helps developers:
-- View runtime logs above the app UI
-- Debug production issues without connecting to IDE
-- Filter and export logs instantly
-- Use it in QA or beta builds for field debugging
+A floating in-app console for Flutter — view, filter, search & export logs while your app runs!  
+`console_plus` lets you debug on-device with a floating overlay console that captures print(), debugPrint(), and developer.log() — in real time.
 
 ---
 
-## Features
+## 🆕 Version 2.0.0 Highlights
+
+🚀 Major Rewrite for Stability & Zone Safety
+
+- 🧭 Zone-safe initialization — no more “Zone mismatch” errors.  
+- 🪄 Unified log capture — `print()` + `debugPrint()` + platform errors all logged automatically.  
+- 🧩 Cleaner API — single `ConsolePlus.initApp()` entry point.  
+- 🎨 Redesigned console UI — smoother, resizable, searchable overlay.  
+- 🧪 Better Flutter Test compatibility — works seamlessly inside test zones.
+
+---
+
+## ✨ Features
 ✅ Floating draggable console overlay  
-✅ Logs display **above your app’s UI** (non-blocking)  
-✅ Supports **multi-line text selection**  
-✅ **Auto-scroll** when near the bottom  
-✅ **Filter logs** by type (`INFO`, `WARNING`, `ERROR`)  
-✅ **Keyword search** for tags or text  
-✅ **Horizontal scrolling** for long lines  
-✅ **Copy**, **clear**, and **export** logs as JSON  
-✅ Built-in **floating bug icon** to toggle visibility
+✅ Logs display above your app’s UI (non-blocking)  
+✅ Captures `print()`, `debugPrint()`, and `developer.log()`  
+✅ Auto-scroll when near the bottom  
+✅ Filter logs by type (`INFO`, `WARNING`, `ERROR`)  
+✅ Keyword search for tags or text  
+✅ Copy, clear, and export logs as JSON  
+✅ Built-in floating 🐞 debug button  
+✅ Captures FlutterError and PlatformDispatcher errors  
+✅ Compatible with Flutter 3.16+ / Dart 3+
 
 ---
 
-## Installation
+## ⚙️ Installation
 
-Add to your project's `pubspec.yaml`:
+Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  console_plus: ^1.0.0
+  console_plus: ^2.0.0
 ```
 
 Then fetch packages:
@@ -60,7 +67,21 @@ import 'package:console_plus/console_plus.dart';
 ---
 
 ## 💻 Usage
-## Step 1 — Show Floating Debug Button
+## Step 1 — Initialize ConsolePlus
+Wrap your app inside ConsolePlus.initApp():
+```dart
+Future<void> main() async {
+  await ConsolePlus.initApp(
+    const MyApp(),
+    interceptPrints: true,          // Capture print() and debugPrint()
+    captureFlutterErrors: true,     // Capture Flutter framework errors
+    capturePlatformErrors: true,    // Capture platform dispatcher errors
+  );
+}
+```
+🧠 This ensures WidgetsFlutterBinding and runApp() are initialized in the same zone — no more zone mismatch errors!
+
+## Step 2 — Show Floating Debug Button
 
 ```dart
 FloatingDebugButton.show(context);
@@ -77,34 +98,104 @@ DebugLogConsole.log("User logged in successfully");
 DebugLogConsole.log("Missing field: email", type: LogType.warning);
 DebugLogConsole.log("API request failed", type: LogType.error);
 ```
-Or replace all print() calls in your app with:
+Or just use:
 
 ```dart
-DebugLogConsole.customLog("Something happened");
+print("Something happened");
+debugPrint("App started!");
 ```
+Both are automatically captured by ConsolePlus.
+
 ## Step 3 — Export Logs
 Tap the ⬇️ Download icon in the console header to export as a .json file.
+
 You can also programmatically call:
 ```dart
 final json = await DebugLogConsole.exportLogs(asJson: true);
 ```
 ## 🎛️ Console UI
 
-- Draggable & resizable window
-- Search bar to filter logs
-- Dropdown filter for log levels
-- Copy, export, and clear actions
-- Persistent scroll and multi-line selection
+- 🟢 Floating, draggable, and resizable window
+- 🔍 Search bar with keyword filtering
+- 🧩 Filter by log levels (Info / Warning / Error)
+- 📋 Copy, ⬇️ Export, 🗑️ Clear logs
+- 📜 Persistent scroll + multi-line selection
+- ⚡ Real-time updates powered by ValueNotifier
 
 ## 🧩 Example
 
 ```dart
-void main() {
-  runApp(const MyApp());
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    FloatingDebugButton.show(context);
-    DebugLogConsole.log("App started");
-  });
+import 'package:flutter/material.dart';
+import 'package:console_plus/console_plus.dart';
+
+Future<void> main() async {
+  await ConsolePlus.initApp(
+    const MyApp(),
+    interceptPrints: true,
+    captureFlutterErrors: true,
+    capturePlatformErrors: true,
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'ConsolePlus Demo',
+      theme: ThemeData.dark(useMaterial3: true),
+      home: const HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int counter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+          (_) => FloatingDebugButton.show(context),
+    );
+  }
+
+  void _generateLogs() {
+    counter++;
+    for (final type in ['Info', 'Warning', 'Error']) {
+      debugPrint('D $type log #$counter');
+      print('P $type log #$counter');
+    }
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('ConsolePlus Demo')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Button pressed $counter times'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _generateLogs,
+              child: const Text('Generate Logs'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 ```
 ## 📂 File Export
@@ -127,6 +218,33 @@ Example output:
 ]
 ```
 ---
+
+## 🧭 Upgrading from v1.x → v2.0.0
+Before:
+```dart
+void main() {
+  ConsolePlus.init(MyApp());
+  runApp(MyApp());
+}
+
+```
+
+After (v2.0.0):
+```dart
+Future<void> main() async {
+  await ConsolePlus.initApp(
+    const MyApp(),
+    interceptPrints: true,
+    captureFlutterErrors: true,
+    capturePlatformErrors: true,
+  );
+}
+```
+✅ ConsolePlus.init() → replaced with ConsolePlus.initApp()
+✅ Initialization now must be awaited
+✅ Zone-safe by default — fixes zone mismatch crashes
+✅ No more manual WidgetsFlutterBinding.ensureInitialized() calls required
+
 
 ## Contributing
 PRs welcome. Keep debug-only behaviour intact. If you add native platform code, ensure release builds keep plugin inert unless explicitly enabled.

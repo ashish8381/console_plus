@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:console_plus/console_plus.dart';
 
-void main() {
-  runApp(const ConsolePlusExampleApp());
+Future<void> main() async {
+  // ✅ Initialize & run app inside ConsolePlus zone
+  await ConsolePlus.initApp(
+    const ConsolePlusExampleApp(),
+    interceptPrints: true,
+    captureFlutterErrors: true,
+    capturePlatformErrors: true,
+  );
 }
 
 class ConsolePlusExampleApp extends StatelessWidget {
@@ -31,7 +37,7 @@ class _ExampleHomeState extends State<ExampleHome> {
   @override
   void initState() {
     super.initState();
-    // Show floating debug button when the app starts
+    // Show Console floating debug button when the app starts
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FloatingDebugButton.show(context);
     });
@@ -50,9 +56,14 @@ class _ExampleHomeState extends State<ExampleHome> {
             ElevatedButton(
               onPressed: () {
                 counter++;
-                DebugLogConsole.log("Info log #$counter", type: LogType.info);
-                DebugLogConsole.log("Warning log #$counter", type: LogType.warning);
-                DebugLogConsole.log("Error log #$counter", type: LogType.error);
+                debugPrint("D Info log #$counter");
+                debugPrint("D Warning log #$counter");
+                debugPrint("D Error log #$counter");
+
+                print("P Info log #$counter");
+                print("P Warning log #$counter");
+                print("P Error log #$counter");
+
                 setState(() {});
               },
               child: const Text("Generate Logs"),

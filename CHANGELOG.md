@@ -73,3 +73,55 @@ All notable changes to this project will be documented here.
 ## 📦 Release Mode Improvements
 
 - 🧹 Hide Debug Floating Button in Release Mode
+
+
+## 2.0.0
+🚀 **Major Rewrite & Stability Upgrade**
+
+This release introduces a complete overhaul of **ConsolePlus**, focused on stability, compatibility, and full log interception across Flutter environments.
+
+---
+
+### ✨ **New Features**
+- ✅ **Unified print interception**
+  - `print()` and `debugPrint()` are now both captured automatically using a single Zone-based system.
+  - All intercepted logs appear instantly in the in-app console.
+- ✅ **Zone-safe Flutter initialization**
+  - Fixed all *“Zone mismatch”* errors by initializing `WidgetsFlutterBinding` and `runApp()` within the same zone.
+  - Ensures compatibility with Flutter 3.24+ and Dart 3 zones.
+- ✅ **Automatic Flutter & Platform error capture**
+  - All uncaught `FlutterError`s and platform-level errors are logged in the console with full stack traces.
+- ✅ **Improved floating console UI**
+  - Draggable, resizable overlay with better readability.
+  - Real-time log filtering (**Info / Warning / Error**).
+  - Search bar with live results.
+  - One-click **copy**, **export (JSON)**, and **clear logs** actions.
+- ✅ **New floating debug button**
+  - Quick toggle to show/hide the floating console from anywhere in the app.
+  - Automatically attaches to the root overlay safely after the first frame.
+- ✅ **Persistent scroll & auto-scroll**
+  - Console remembers user scroll position and only auto-scrolls when near the bottom.
+- ✅ **Export logs**
+  - Export logs as plain text or JSON file.
+  - Integrated with `file_saver` for desktop and mobile exports.
+
+---
+
+### 🧩 **Under the Hood**
+- Rewritten `ConsolePlus.initApp()` for clean Zone management.
+- Added `_detectType()` logic to classify logs as `info`, `warning`, or `error`.
+- Simplified `DebugLogConsole` architecture for speed and thread safety.
+- Added `PrintCapturer` for early print interception before app startup.
+- Added `ConsolePlusLog.overrideLogHandler()` for custom `developer.log` interception.
+- Improved UI rendering performance and eliminated rebuild flicker.
+
+### ⚠️ **Breaking Changes**
+- `ConsolePlus.init()` renamed to **`ConsolePlus.initApp()`**.
+- Initialization now must be awaited:
+  ```dart
+  await ConsolePlus.initApp(
+    const MyApp(),
+    interceptPrints: true,
+    captureFlutterErrors: true,
+    capturePlatformErrors: true,
+  );

@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:ui';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'console_plus_platform_interface.dart';
+import 'dart:developer';
 
 /// 🔹 Log Type Enum
 enum LogType { info, warning, error }
@@ -507,8 +509,117 @@ class _FloatingDebugButtonWidgetState
 }
 
 class ConsolePlus {
-  Future<String?> getPlatformVersion() {
-    return ConsolePlusPlatform.instance.getPlatformVersion();
+  static bool _initialized = false;
+
+  static Future<void> initApp(
+    Widget app, {
+    bool interceptPrints = true,
+    bool captureFlutterErrors = true,
+    bool capturePlatformErrors = true,
+  }) async {
+    if (_initialized) return;
+    _initialized = true;
+
+    // ✅ Step 1: Build the ZoneSpecification for print()
+    final spec = ZoneSpecification(
+      print: (self, parent, zone, line) {
+        if (interceptPrints) {
+          DebugLogConsole.addLog("$line", type: _detectType(line));
+        }
+        parent.print(zone, line); // still goes to IDE console
+      },
+    );
+
+    // ✅ Step 2: Run Flutter initialization + runApp in the SAME zone
+    Zone.current.fork(specification: spec).run(() async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      if (captureFlutterErrors) {
+        FlutterError.onError = (FlutterErrorDetails details) {
+          DebugLogConsole.addLog(
+            "[FlutterError] ${details.exceptionAsString()}\n${details.stack ?? ''}",
+            type: LogType.error,
+          );
+          FlutterError.presentError(details);
+        };
+      }
+
+      if (capturePlatformErrors) {
+        PlatformDispatcher.instance.onError = (error, stack) {
+          DebugLogConsole.addLog(
+            "[PlatformError] $error\n$stack",
+            type: LogType.error,
+          );
+          return true;
+        };
+      }
+
+      DebugLogConsole.addLog(
+        "✅ ConsolePlus initialized — print & debugPrint interception active",
+        type: LogType.info,
+      );
+
+      runApp(app);
+    });
+  }
+
+  /// ✅ Intercept dart:developer.log()
+
+  static LogType _detectType(String message) {
+    final lower = message.toLowerCase();
+    if (lower.contains('error') ||
+        lower.contains('exception') ||
+        lower.contains('fail')) return LogType.error;
+    if (lower.contains('warn')) return LogType.warning;
+    return LogType.info;
+  }
+}
+
+typedef DeveloperLogHandler = void Function(String message,
+    {String name, int level, Object? error, StackTrace? stackTrace});
+
+class ConsolePlusLog {
+  static DeveloperLogHandler? _customHandler;
+
+  static void overrideLogHandler(DeveloperLogHandler handler) {
+    _customHandler = handler;
+  }
+
+  static void log(String message,
+      {String name = '',
+      int level = 0,
+      Object? error,
+      StackTrace? stackTrace}) {
+    if (_customHandler != null) {
+      _customHandler!(
+        message,
+        name: name,
+        level: level,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    } else {
+      dev.log(message,
+          name: name, level: level, error: error, stackTrace: stackTrace);
+    }
+  }
+}
+
+/// 🟩 NEW: Early Print Capturer
+class PrintCapturer {
+  static void runAppWithCapture(VoidCallback appRunner) {
+    runZonedGuarded(() {
+      final spec = ZoneSpecification(
+        print: (self, parent, zone, line) {
+          DebugLogConsole.addLog(line);
+          parent.print(zone, line);
+        },
+      );
+      Zone.current.fork(specification: spec).run(appRunner);
+    }, (error, stack) {
+      DebugLogConsole.addLog("🔥 Uncaught Error: $error", type: LogType.error);
+      DebugLogConsole.addLog("$stack", type: LogType.error);
+    });
   }
 }
 

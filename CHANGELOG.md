@@ -125,3 +125,11 @@ This release introduces a complete overhaul of **ConsolePlus**, focused on stabi
     captureFlutterErrors: true,
     capturePlatformErrors: true,
   );
+
+## 2.0.1
+🚀 **Major Rewrite & Stability Upgrade**
+
+- Remove support of 'js_interop'
+- Fixed minor Bugs
+---
+

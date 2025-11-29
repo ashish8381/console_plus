@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:console_plus/console_plus.dart';
@@ -57,7 +58,9 @@ void main() {
       await ConsolePlus.initApp(const TestApp());
 
       // Act
-      print('Print interception test');
+      if (kDebugMode) {
+        print('Print interception test');
+      }
       await Future.delayed(const Duration(milliseconds: 50));
 
       // Assert

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:console_plus/console_plus.dart';
 
@@ -54,18 +55,52 @@ class _ExampleHomeState extends State<ExampleHome> {
             Text("Button pressed $counter times"),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                counter++;
-                debugPrint("D Info log #$counter");
-                debugPrint("D Warning log #$counter");
-                debugPrint("D Error log #$counter");
+              onPressed: () async {
+                const totalLogs = 300; // number of logs to generate
+                const logSize =
+                    50000; // each log = ~500 KB (adjust up to 1_000_000 for 1MB)
+                const delay = Duration(
+                  milliseconds: 50,
+                ); // small pause between logs
 
-                print("P Info log #$counter");
-                print("P Warning log #$counter");
-                print("P Error log #$counter");
+                debugPrint(
+                  "🚀 Starting large log stress test: $totalLogs logs, $logSize bytes each",
+                );
 
-                setState(() {});
+                final largeChunk =
+                    'X' * logSize; // prebuild one large string to reuse
+
+                for (int i = 0; i < totalLogs; i++) {
+                  final message = "🔥 MASSIVE LOG #$i\n$largeChunk";
+
+                  // Alternate between print & debugPrint
+                  if (i.isEven) {
+                    if (kDebugMode) {
+                      print(message);
+                    }
+                  } else {
+                    debugPrint(message);
+                  }
+
+                  // Small delay to let GC catch up
+                  await Future.delayed(delay);
+                }
+
+                debugPrint("✅ Finished large log stress test without crash");
               },
+
+              // onPressed: () {
+              //   counter++;
+              //   debugPrint("D Info log #$counter");
+              //   debugPrint("D Warning log #$counter");
+              //   debugPrint("D Error log #$counter");
+              //
+              //   print("P Info log #$counter");
+              //   print("P Warning log #$counter");
+              //   print("P Error log #$counter");
+              //
+              //   setState(() {});
+              // },
               child: const Text("Generate Logs"),
             ),
           ],

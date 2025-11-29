@@ -17,7 +17,7 @@ A floating in-app console for Flutter — view, filter, search & export logs whi
 
 ---
 
-## 🆕 Version 2.0.0 Highlights
+## 🆕 Version 2.0.0 & 2.0.1 Highlights
 
 🚀 Major Rewrite for Stability & Zone Safety
 
@@ -49,7 +49,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  console_plus: ^2.0.0
+  console_plus: ^2.0.1
 ```
 
 Then fetch packages:
@@ -219,7 +219,7 @@ Example output:
 ```
 ---
 
-## 🧭 Upgrading from v1.x → v2.0.0
+## 🧭 Upgrading from v1.x → v2.0.1
 Before:
 ```dart
 void main() {

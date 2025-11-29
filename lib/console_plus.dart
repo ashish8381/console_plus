@@ -27,7 +27,9 @@ class DebugLogConsole {
   static final ValueNotifier<List<LogEntry>> logsNotifier =
       ValueNotifier<List<LogEntry>>([]);
 
-  static int maxLogCount = 2000; // Limit log memory size
+  static int maxLogCount = 2000; // ✅ you already have this
+  static const int _maxMessageLength = 8000; // 8 KB per log message
+  static Timer? _debounce; // for smooth UI updates
 
   /// ✅ Use this instead of print()
   static void Function(String, {LogType type}) customLog = _defaultLog;
@@ -38,14 +40,29 @@ class DebugLogConsole {
     debugPrint(message);
   }
 
-  /// ✅ Add log to list
+  /// ✅ Add log with truncation, size limit, and debounce
   static void addLog(String message, {LogType type = LogType.info}) {
-    if (_logs.length >= maxLogCount) _logs.removeAt(0);
+    // 🔹 Truncate overly large messages
+    if (message.length > _maxMessageLength) {
+      message = '${message.substring(0, _maxMessageLength)}... [truncated]';
+    }
+
+    // 🔹 Limit total logs to avoid heap growth
+    if (_logs.length >= maxLogCount) {
+      _logs.removeAt(0);
+    }
+
     _logs.add(LogEntry(message, type));
-    logsNotifier.value = List.from(_logs); // Notifies UI
+
+    // 🔹 Debounce UI rebuilds to prevent jank during spam logging
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 150), () {
+      // ✅ trigger safely — no direct notifyListeners()
+      logsNotifier.value = List.from(_logs);
+    });
   }
 
-  /// ✅ Public logging method
+  /// ✅ Public method to log easily
   static void log(String message, {LogType type = LogType.info}) {
     if (!kDebugMode) return;
     customLog(message, type: type);
@@ -53,14 +70,14 @@ class DebugLogConsole {
 
   static List<LogEntry> get logs => _logs;
 
-  /// ✅ Export logs to file/string
+  /// ✅ Export logs safely as text or JSON
   static Future<String> exportLogs({bool asJson = false}) async {
     if (asJson) {
       final jsonList = _logs
           .map((e) => {
                 "message": e.message,
                 "type": e.type.name,
-                "timestamp": e.timestamp.toIso8601String()
+                "timestamp": e.timestamp.toIso8601String(),
               })
           .toList();
       return jsonEncode(jsonList);
@@ -68,7 +85,8 @@ class DebugLogConsole {
       final buffer = StringBuffer();
       for (var log in _logs) {
         buffer.writeln(
-            "[${log.timestamp.toIso8601String()}] (${log.type.name.toUpperCase()}) ${log.message}");
+          "[${log.timestamp.toIso8601String()}] (${log.type.name.toUpperCase()}) ${log.message}",
+        );
       }
       return buffer.toString();
     }
@@ -524,7 +542,7 @@ class ConsolePlus {
     final spec = ZoneSpecification(
       print: (self, parent, zone, line) {
         if (interceptPrints) {
-          DebugLogConsole.addLog("$line", type: _detectType(line));
+          DebugLogConsole.addLog(line, type: _detectType(line));
         }
         parent.print(zone, line); // still goes to IDE console
       },
@@ -569,7 +587,9 @@ class ConsolePlus {
     final lower = message.toLowerCase();
     if (lower.contains('error') ||
         lower.contains('exception') ||
-        lower.contains('fail')) return LogType.error;
+        lower.contains('fail')) {
+      return LogType.error;
+    }
     if (lower.contains('warn')) return LogType.warning;
     return LogType.info;
   }
@@ -642,6 +662,7 @@ class _PersistentSelectableConsole extends StatefulWidget {
 class _PersistentSelectableConsoleState
     extends State<_PersistentSelectableConsole> {
   final TextEditingController _controller = TextEditingController();
+  static const int _maxVisibleLogs = 500; // ✅ Show only the last 500 logs
 
   @override
   void dispose() {
@@ -650,8 +671,13 @@ class _PersistentSelectableConsoleState
   }
 
   void _updateLogs(List<LogEntry> logs) {
-    // Apply filters
-    final filtered = logs.where((log) {
+    // ✅ Limit logs to recent subset for performance
+    final recentLogs = logs.length > _maxVisibleLogs
+        ? logs.sublist(logs.length - _maxVisibleLogs)
+        : logs;
+
+    // ✅ Apply filters and keyword
+    final filtered = recentLogs.where((log) {
       final matchType =
           widget.filterTypes.isEmpty || widget.filterTypes.contains(log.type);
       final matchKeyword = widget.keyword.isEmpty ||
@@ -659,7 +685,7 @@ class _PersistentSelectableConsoleState
       return matchType && matchKeyword;
     }).toList();
 
-    // Build updated text
+    // ✅ Build efficient text buffer
     final buffer = StringBuffer();
     for (var log in filtered) {
       final ms = log.timestamp.millisecond.toString().padLeft(3, '0');
@@ -667,17 +693,26 @@ class _PersistentSelectableConsoleState
           "${log.timestamp.minute.toString().padLeft(2, '0')}:"
           "${log.timestamp.second.toString().padLeft(2, '0')}."
           "$ms";
-      buffer.writeln(
-          "[$timeString] [${log.type.name.toUpperCase()}] ${log.message}");
+
+      // 🧠 Efficiently truncate overly long lines
+      final msg = log.message.length > 4000
+          ? '${log.message.substring(0, 4000)}... [truncated]'
+          : log.message;
+
+      buffer.writeln("[$timeString] [${log.type.name.toUpperCase()}] $msg");
     }
 
-    _controller.text = buffer.toString();
+    // ✅ Only update text if significantly changed
+    if (_controller.text != buffer.toString()) {
+      _controller.text = buffer.toString();
+    }
 
+    // ✅ Maintain scroll position near bottom
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!widget.scrollController.hasClients) return;
       final pos = widget.scrollController.position;
-      final distanceFromBottom = (pos.maxScrollExtent - pos.pixels).abs();
-      if (distanceFromBottom < 80) {
+      final distance = (pos.maxScrollExtent - pos.pixels).abs();
+      if (distance < 100) {
         widget.scrollController.animateTo(
           pos.maxScrollExtent,
           duration: const Duration(milliseconds: 200),
@@ -692,7 +727,6 @@ class _PersistentSelectableConsoleState
     return ValueListenableBuilder<List<LogEntry>>(
       valueListenable: DebugLogConsole.logsNotifier,
       builder: (context, logs, _) {
-        // Update controller text
         _updateLogs(logs);
 
         return Container(
@@ -703,12 +737,11 @@ class _PersistentSelectableConsoleState
             controller: widget.scrollController,
             radius: const Radius.circular(8),
 
-            /// ✅ Outer (vertical) scroll
+            /// ✅ Vertical & horizontal scrolls separated
             child: SingleChildScrollView(
               controller: widget.scrollController,
               scrollDirection: Axis.vertical,
               child: SingleChildScrollView(
-                /// ✅ Inner horizontal scroll
                 scrollDirection: Axis.horizontal,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minWidth: 800),
